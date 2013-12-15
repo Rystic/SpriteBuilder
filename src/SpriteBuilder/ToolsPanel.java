@@ -21,6 +21,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JToggleButton;
@@ -212,7 +213,17 @@ public class ToolsPanel extends JPanel
 		@Override
 		public void actionPerformed(ActionEvent e)
 		{
-			_parentBuilder.createDrawPanel(20, 10);
+			int confirm = JOptionPane.showConfirmDialog(
+					null,
+					"Are you sure you want to create a new sprite (unsaved changes will be discarded)?");
+			if (confirm != 0)
+			{
+				return;
+			}
+
+			Color[][] tiles = _parentBuilder.getDrawPanel().getColorGrid();
+			_parentBuilder.getDrawPanel().setColorGrid(
+					new Color[tiles.length][tiles[0].length]);
 		}
 
 	}
@@ -385,7 +396,7 @@ public class ToolsPanel extends JPanel
 			_parentBuilder.getDrawPanel().setColorGrid(newTiles);
 		}
 	}
-	
+
 	private static int DEFAULT_PIXEL_SIZE = 1;
 
 	private JMenuBar _menuBar;
