@@ -104,6 +104,7 @@ public class DrawPanel extends JPanel
 	setColorGrid(Color[][] newColorGrid)
 	{
 		_colorGrid = newColorGrid;
+		repaint();
 	}
 
 	private class DrawListener implements MouseMotionListener,
