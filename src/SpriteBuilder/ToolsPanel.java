@@ -80,8 +80,9 @@ public class ToolsPanel extends JPanel
 		_drawMenuOption.addActionListener(new PanelOptionListener(
 				PanelOptionListener.PANEL_DRAW));
 
-		_pixelSizeField = new JSlider();
-		_pixelSizeField.addChangeListener(new PixelSizeListener());
+		_pixelSizeSlider = new JSlider();
+		_pixelSizeSlider.setValue(DEFAULT_PIXEL_SIZE);
+		_pixelSizeSlider.addChangeListener(new PixelSizeListener());
 		_pixelSizeLabel = new JLabel();
 
 		_viewMenu.add(_previewMenuOption);
@@ -98,7 +99,7 @@ public class ToolsPanel extends JPanel
 
 		_rotateButton.addActionListener(new RotateListener());
 		_rotateButton.setMnemonic(KeyEvent.VK_R);
-		
+
 		drawComponents();
 	}
 
@@ -114,12 +115,12 @@ public class ToolsPanel extends JPanel
 
 		pixelAdjust.setLayout(new BoxLayout(pixelAdjust, BoxLayout.Y_AXIS));
 
-		_pixelSizeLabel.setText("Block Size: " + _pixelSizeField.getValue()
+		_pixelSizeLabel.setText("Block Size: " + _pixelSizeSlider.getValue()
 				+ " px");
 		_pixelSizeLabel.setAlignmentY(200f);
 
 		pixelAdjust.add(_pixelSizeLabel);
-		pixelAdjust.add(_pixelSizeField);
+		pixelAdjust.add(_pixelSizeSlider);
 		add(pixelAdjust, BorderLayout.SOUTH);
 		buttonsPanel.add(_eraseButton);
 		buttonsPanel.add(_fillButton);
@@ -179,7 +180,7 @@ public class ToolsPanel extends JPanel
 
 	public int getPixelSize()
 	{
-		return _pixelSizeField.getValue() > 0 ? _pixelSizeField.getValue() : 1;
+		return _pixelSizeSlider.getValue() > 0 ? _pixelSizeSlider.getValue() : 1;
 	}
 
 	private class PNGConverstionListener implements ActionListener
@@ -316,8 +317,8 @@ public class ToolsPanel extends JPanel
 		@Override
 		public void stateChanged(ChangeEvent e)
 		{
-			_pixelSizeLabel.setText("Block Size: " + _pixelSizeField.getValue()
-					+ " px");
+			_pixelSizeLabel.setText("Block Size: "
+					+ _pixelSizeSlider.getValue() + " px");
 			_parentBuilder.getPreviewPanel().repaint();
 		}
 
@@ -384,6 +385,8 @@ public class ToolsPanel extends JPanel
 			_parentBuilder.getDrawPanel().setColorGrid(newTiles);
 		}
 	}
+	
+	private static int DEFAULT_PIXEL_SIZE = 1;
 
 	private JMenuBar _menuBar;
 
@@ -399,7 +402,7 @@ public class ToolsPanel extends JPanel
 
 	private JLabel _pixelSizeLabel;
 
-	private JSlider _pixelSizeField;
+	private JSlider _pixelSizeSlider;
 
 	private JColorChooser _colorChooser;
 	private JToggleButton _eraseButton = new JToggleButton("(E)rase");
