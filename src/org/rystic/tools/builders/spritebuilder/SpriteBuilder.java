@@ -105,6 +105,7 @@ public class SpriteBuilder
 			newCursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
 		}
 		_drawPanel.setCursor(newCursor);
+		_drawPanel.repaint();
 	}
 
 	/* Menu Actions */

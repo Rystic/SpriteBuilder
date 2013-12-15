@@ -41,9 +41,11 @@ public class ToolsPanel extends JPanel
 
 		// _fillButton.setIcon(new ImageIcon("fillTool.png"));
 		_fillButton.addKeyListener(new HotkeyListener(_parentBuilder));
+		_fillButton.addActionListener(new IconListener());
 
 		// _eraseButton.setIcon(new ImageIcon("eraseTool.png"));
 		_eraseButton.addKeyListener(new HotkeyListener(_parentBuilder));
+		_eraseButton.addActionListener(new IconListener());
 
 		_gridButton.setSelected(true);
 		_gridButton.addActionListener(new GridListener());
@@ -395,6 +397,15 @@ public class ToolsPanel extends JPanel
 				}
 			}
 			_parentBuilder.getDrawPanel().setColorGrid(newTiles);
+		}
+	}
+	
+	private class IconListener implements ActionListener
+	{
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+			_parentBuilder.calculateCursor();
 		}
 	}
 
