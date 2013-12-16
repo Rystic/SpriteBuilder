@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -80,8 +81,9 @@ public class ToolsPanel extends JPanel
 		_drawMenuOption.addActionListener(new PanelOptionListener(
 				PanelOptionListener.PANEL_DRAW));
 
-		_pixelSizeField = new JSlider();
-		_pixelSizeField.addChangeListener(new PixelSizeListener());
+		_pixelSizeSlider = new JSlider();
+		_pixelSizeSlider.setValue(DEFAULT_PIXEL_SIZE);
+		_pixelSizeSlider.addChangeListener(new PixelSizeListener());
 		_pixelSizeLabel = new JLabel();
 
 		_viewMenu.add(_previewMenuOption);
@@ -89,6 +91,15 @@ public class ToolsPanel extends JPanel
 
 		_menuBar.add(_fileMenu);
 		_menuBar.add(_viewMenu);
+
+		_flipHoriztonalButton.addActionListener(new FlipHorizontalListener());
+		_flipHoriztonalButton.setMnemonic(KeyEvent.VK_H);
+
+		_flipVerticalButton.addActionListener(new FlipVerticalListener());
+		_flipVerticalButton.setMnemonic(KeyEvent.VK_V);
+
+		_rotateButton.addActionListener(new RotateListener());
+		_rotateButton.setMnemonic(KeyEvent.VK_R);
 
 		drawComponents();
 	}
@@ -105,16 +116,20 @@ public class ToolsPanel extends JPanel
 
 		pixelAdjust.setLayout(new BoxLayout(pixelAdjust, BoxLayout.Y_AXIS));
 
-		_pixelSizeLabel.setText("Block Size: " + _pixelSizeField.getValue() + " px");
+		_pixelSizeLabel.setText("Block Size: " + _pixelSizeSlider.getValue()
+				+ " px");
 		_pixelSizeLabel.setAlignmentY(200f);
 
 		pixelAdjust.add(_pixelSizeLabel);
-		pixelAdjust.add(_pixelSizeField);
+		pixelAdjust.add(_pixelSizeSlider);
 		add(pixelAdjust, BorderLayout.SOUTH);
 		buttonsPanel.add(_eraseButton);
 		buttonsPanel.add(_fillButton);
 		buttonsPanel.add(_gridButton);
 		buttonsPanel.add(_convertToPng);
+		buttonsPanel.add(_flipHoriztonalButton);
+		buttonsPanel.add(_flipVerticalButton);
+		buttonsPanel.add(_rotateButton);
 		add(buttonsPanel, BorderLayout.CENTER);
 
 	}
@@ -166,7 +181,7 @@ public class ToolsPanel extends JPanel
 
 	public int getPixelSize()
 	{
-		return _pixelSizeField.getValue() > 0 ? _pixelSizeField.getValue() : 1;
+		return _pixelSizeSlider.getValue() > 0 ? _pixelSizeSlider.getValue() : 1;
 	}
 
 	private class PNGConverstionListener implements ActionListener
@@ -296,18 +311,83 @@ public class ToolsPanel extends JPanel
 
 		private String _panelType;
 	}
-	
+
 	private class PixelSizeListener implements ChangeListener
 	{
 
 		@Override
 		public void stateChanged(ChangeEvent e)
 		{
-			_pixelSizeLabel.setText("Block Size: " + _pixelSizeField.getValue() + " px");
+			_pixelSizeLabel.setText("Block Size: "
+					+ _pixelSizeSlider.getValue() + " px");
 			_parentBuilder.getPreviewPanel().repaint();
 		}
-		
+
 	}
+
+	private class FlipHorizontalListener implements ActionListener
+	{
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+			Color[][] tiles = _parentBuilder.getDrawPanel().getColorGrid();
+			Color[][] newTiles = new Color[tiles.length][tiles[0].length];
+			int width = tiles.length;
+			int height = tiles[0].length;
+			for (int i = 0; i < (height / 2) + 1; i++)
+			{
+				for (int j = 0; j < width; j++)
+				{
+					newTiles[height - (i + 1)][j] = tiles[i][j];
+					newTiles[i][j] = tiles[height - (i + 1)][j];
+				}
+			}
+			_parentBuilder.getDrawPanel().setColorGrid(newTiles);
+		}
+	}
+
+	private class FlipVerticalListener implements ActionListener
+	{
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+			Color[][] tiles = _parentBuilder.getDrawPanel().getColorGrid();
+			Color[][] newTiles = new Color[tiles.length][tiles[0].length];
+			int width = tiles.length;
+			int height = tiles[0].length;
+			for (int i = 0; i < height; i++)
+			{
+				for (int j = 0; j < (width / 2) + 1; j++)
+				{
+					newTiles[i][width - (j + 1)] = tiles[i][j];
+					newTiles[i][j] = tiles[i][width - (j + 1)];
+				}
+			}
+			_parentBuilder.getDrawPanel().setColorGrid(newTiles);
+		}
+	}
+
+	private class RotateListener implements ActionListener
+	{
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+			Color[][] tiles = _parentBuilder.getDrawPanel().getColorGrid();
+			Color[][] newTiles = new Color[tiles.length][tiles[0].length];
+			int width = tiles.length;
+			int height = tiles[0].length;
+			for (int i = 0; i < height; i++)
+			{
+				for (int j = width - 1; j >= 0; j--)
+				{
+					newTiles[i][tiles.length - 1 - j] = tiles[j][i];
+				}
+			}
+			_parentBuilder.getDrawPanel().setColorGrid(newTiles);
+		}
+	}
+	
+	private static int DEFAULT_PIXEL_SIZE = 1;
 
 	private JMenuBar _menuBar;
 
@@ -320,10 +400,10 @@ public class ToolsPanel extends JPanel
 	private JMenu _viewMenu;
 	private JMenuItem _previewMenuOption;
 	private JMenuItem _drawMenuOption;
-	
+
 	private JLabel _pixelSizeLabel;
 
-	private JSlider _pixelSizeField;
+	private JSlider _pixelSizeSlider;
 
 	private JColorChooser _colorChooser;
 	private JToggleButton _eraseButton = new JToggleButton("(E)rase");
@@ -331,6 +411,9 @@ public class ToolsPanel extends JPanel
 	private JToggleButton _gridButton = new JToggleButton("(G)rid");
 
 	private JButton _convertToPng = new JButton("(C)onvert to .png");
+	private JButton _flipHoriztonalButton = new JButton("Flip Horizontal");
+	private JButton _flipVerticalButton = new JButton("Flip Vertical");
+	private JButton _rotateButton = new JButton("Rotate CCW");
 
 	private final SpriteBuilder _parentBuilder;
 
