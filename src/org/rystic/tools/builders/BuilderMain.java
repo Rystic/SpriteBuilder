@@ -1,6 +1,6 @@
-package builders;
+package org.rystic.tools.builders;
 
-import SpriteBuilder.SpriteBuilder;
+import org.rystic.tools.builders.spritebuilder.SpriteBuilder;
 
 public class BuilderMain
 {

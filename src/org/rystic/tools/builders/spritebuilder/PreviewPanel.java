@@ -1,4 +1,4 @@
-package SpriteBuilder;
+package org.rystic.tools.builders.spritebuilder;
 
 import java.awt.Color;
 import java.awt.Graphics;

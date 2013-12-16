@@ -1,4 +1,4 @@
-package SpriteBuilder;
+package org.rystic.tools.builders.spritebuilder;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -26,7 +26,8 @@ import javax.swing.JToggleButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import builders.PNGDrawer;
+import org.rystic.tools.builders.PNGDrawer;
+
 
 @SuppressWarnings("serial")
 public class ToolsPanel extends JPanel

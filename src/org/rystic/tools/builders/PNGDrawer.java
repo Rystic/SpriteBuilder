@@ -1,4 +1,4 @@
-package builders;
+package org.rystic.tools.builders;
 
 import java.awt.Color;
 import java.awt.Graphics2D;

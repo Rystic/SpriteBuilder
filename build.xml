@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="spritebuilder" default="compile">
+    <description>
+      Spritebuilder
+    </description>
+
+    <property name="outdir" value="${basedir}/classes"/>
+    <property name="srcdir" value="${basedir}/src"/>
+
+    <target name="compile" depends="init" description="spritebuilder">
+      <javac destdir="${outdir}" srcdir="${srcdir}" debug="on"/>
+    </target>
+
+    <target name="init">
+      <mkdir dir="${outdir}"/>
+    </target>	
+
+    <target name="run" depends="compile">  
+      <java classname="org.crb.tools.BuilderMain" classpath="${outdir}" fork="yes"/>
+    </target>	
+
+    <target name="jar" depends="compile">
+      <jar destfile="spritebuilder.jar" basedir="${outdir}">
+        <manifest>
+          <attribute name="Main-Class" value="org.crb.tools.BuilderMain"/>
+        </manifest>   
+      </jar>
+    </target>
+	
+</project>

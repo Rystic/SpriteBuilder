@@ -1,9 +1,10 @@
-package SpriteBuilder;
+package org.rystic.tools.builders.spritebuilder;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-import builders.PNGDrawer;
+import org.rystic.tools.builders.PNGDrawer;
+
 
 public class HotkeyListener implements KeyListener
 {
