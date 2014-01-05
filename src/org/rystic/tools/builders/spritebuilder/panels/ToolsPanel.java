@@ -1,4 +1,4 @@
-package org.rystic.tools.builders.spritebuilder;
+package org.rystic.tools.builders.spritebuilder.panels;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -24,30 +24,31 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JToggleButton;
+import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.rystic.tools.builders.BuilderMain;
-import org.rystic.tools.builders.PNGDrawer;
+import org.bushe.swing.event.EventSubscriber;
+import org.rystic.tools.builders.spritebuilder.SpriteBuilder;
+import org.rystic.tools.builders.spritebuilder.SpriteBuilderConstants;
+import org.rystic.tools.builders.spritebuilder.panels.events.HotKeyEvent;
+import org.rystic.tools.builders.spritebuilder.panels.util.PNGDrawer;
 
 @SuppressWarnings("serial")
-public class ToolsPanel extends JPanel
+public class ToolsPanel extends JPanel implements EventSubscriber<HotKeyEvent>
 {
 	public ToolsPanel(SpriteBuilder parentBuilder)
 	{
 		_parentBuilder = parentBuilder;
 
 		// _fillButton.setIcon(new ImageIcon("fillTool.png"));
-		_fillButton.addKeyListener(new HotkeyListener(_parentBuilder));
 		_fillButton.addActionListener(new IconListener());
 
 		// _eraseButton.setIcon(new ImageIcon("eraseTool.png"));
-		_eraseButton.addKeyListener(new HotkeyListener(_parentBuilder));
 		_eraseButton.addActionListener(new IconListener());
 
 		_gridButton.setSelected(true);
 		_gridButton.addActionListener(new GridListener());
-		_gridButton.addKeyListener(new HotkeyListener(_parentBuilder));
 
 		_colorChooser = new JColorChooser();
 
@@ -56,11 +57,28 @@ public class ToolsPanel extends JPanel
 		_menuBar = new JMenuBar();
 		_fileMenu = new JMenu("File");
 		_newSpriteOption = new JMenuItem("New Sprite", new ImageIcon(
-				"art/newFileIcon.png"));
+				"art/newFileMedium.png"));
 		_newSpriteOption.addActionListener(new NewFileListener());
-		_saveOption = new JMenuItem("(S)ave", new ImageIcon("art/saveIcon.png"));
+		_newSpriteOption.setMnemonic(KeyEvent.VK_N);
+		_newSpriteOption.setAccelerator(KeyStroke.getKeyStroke(
+				KeyEvent.VK_N,
+				ActionEvent.ALT_MASK));
+
+		_saveOption = new JMenuItem("Save", new ImageIcon(
+				"art/saveIconMedium.png"));
 		_saveOption.addActionListener(new PNGConverstionListener());
-		_loadOption = new JMenuItem("Load", new ImageIcon("art/loadIcon.png"));
+		_saveOption.setMnemonic(KeyEvent.VK_S);
+		_saveOption.setAccelerator(KeyStroke.getKeyStroke(
+				KeyEvent.VK_S,
+				ActionEvent.CTRL_MASK));
+
+		_loadOption = new JMenuItem("Load",new ImageIcon(
+				"art/loadIconMedium.png"));
+		_loadOption.setMnemonic(KeyEvent.VK_L);
+		_loadOption.setAccelerator(KeyStroke.getKeyStroke(
+				KeyEvent.VK_L,
+				ActionEvent.CTRL_MASK));
+
 		_loadOption.addActionListener(new LoadFileListener());
 		_exitOption = new JMenuItem("Exit");
 		_exitOption.addActionListener(new ExitListener());
@@ -218,17 +236,21 @@ public class ToolsPanel extends JPanel
 			{
 				return;
 			}
-			String pixelSizeString = JOptionPane.showInputDialog("Pixel Size?");
+			String pixelSizeString = JOptionPane
+					.showInputDialog("Pixel Size? (default "
+							+ SpriteBuilderConstants.DEFAULT_IMAGE_SIZE + "px)");
 			int pixelSize;
 			try
 			{
 				if (pixelSizeString == null || pixelSizeString.isEmpty())
-					pixelSize = BuilderMain._imageSize;
+					pixelSize = SpriteBuilderConstants.DEFAULT_IMAGE_SIZE;
 				else
 					pixelSize = Integer.parseInt(pixelSizeString);
+				if (pixelSize < 0)
+					pixelSize = SpriteBuilderConstants.DEFAULT_IMAGE_SIZE;
 			} catch (NumberFormatException e_)
 			{
-				pixelSize = BuilderMain._imageSize;
+				pixelSize = SpriteBuilderConstants.DEFAULT_IMAGE_SIZE;
 			}
 			_parentBuilder.getDrawPanel().setColorGrid(
 					new Color[pixelSize][pixelSize]);
@@ -392,6 +414,12 @@ public class ToolsPanel extends JPanel
 		{
 			_parentBuilder.calculateCursor();
 		}
+	}
+
+	@Override
+	public void onEvent(HotKeyEvent e_)
+	{
+
 	}
 
 	private static int DEFAULT_PIXEL_SIZE = 1;

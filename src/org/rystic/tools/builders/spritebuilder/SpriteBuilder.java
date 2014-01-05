@@ -11,6 +11,11 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JTabbedPane;
 
+import org.rystic.tools.builders.spritebuilder.panels.DrawPanel;
+import org.rystic.tools.builders.spritebuilder.panels.PreviewPanel;
+import org.rystic.tools.builders.spritebuilder.panels.ToolsPanel;
+import org.rystic.tools.builders.spritebuilder.panels.util.HotkeyListener;
+
 public class SpriteBuilder
 {
 	public SpriteBuilder(int width, int height)
@@ -150,6 +155,11 @@ public class SpriteBuilder
 	public JFrame getPreviewFrame()
 	{
 		return _previewPanelFrame;
+	}
+	
+	public static void main(String[] args)
+	{
+		 new SpriteBuilder(SpriteBuilderConstants.DEFAULT_IMAGE_SIZE, SpriteBuilderConstants.DEFAULT_IMAGE_SIZE);
 	}
 
 	private JMenuBar _frameMenuBar = new JMenuBar();

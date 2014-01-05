@@ -1,9 +1,11 @@
-package org.rystic.tools.builders.spritebuilder;
+package org.rystic.tools.builders.spritebuilder.panels;
 
 import java.awt.Color;
 import java.awt.Graphics;
 
 import javax.swing.JPanel;
+
+import org.rystic.tools.builders.spritebuilder.SpriteBuilder;
 
 public class PreviewPanel extends JPanel
 {
@@ -71,7 +73,6 @@ public class PreviewPanel extends JPanel
 	private int _gridHeight;
 	private int _pixelSize;
 
-	private ToolsPanel _toolsPanel;
 	private SpriteBuilder _parentBuilder;
 
 }

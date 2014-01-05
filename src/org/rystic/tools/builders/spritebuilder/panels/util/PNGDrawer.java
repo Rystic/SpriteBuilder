@@ -1,4 +1,4 @@
-package org.rystic.tools.builders;
+package org.rystic.tools.builders.spritebuilder.panels.util;
 
 import java.awt.Color;
 import java.awt.Graphics2D;

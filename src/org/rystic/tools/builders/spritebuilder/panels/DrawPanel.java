@@ -1,4 +1,4 @@
-package org.rystic.tools.builders.spritebuilder;
+package org.rystic.tools.builders.spritebuilder.panels;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -11,6 +11,8 @@ import java.util.LinkedList;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+
+import org.rystic.tools.builders.spritebuilder.SpriteBuilder;
 
 @SuppressWarnings("serial")
 public class DrawPanel extends JPanel

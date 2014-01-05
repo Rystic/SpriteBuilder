@@ -1,9 +1,11 @@
-package org.rystic.tools.builders.spritebuilder;
+package org.rystic.tools.builders.spritebuilder.panels.util;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-import org.rystic.tools.builders.PNGDrawer;
+import org.rystic.tools.builders.spritebuilder.SpriteBuilder;
+import org.rystic.tools.builders.spritebuilder.panels.DrawPanel;
+import org.rystic.tools.builders.spritebuilder.panels.ToolsPanel;
 
 
 public class HotkeyListener implements KeyListener
@@ -36,7 +38,7 @@ public class HotkeyListener implements KeyListener
 		{
 			_drawPanel.undo();
 		}
-		else if (e_.getKeyCode() == KeyEvent.VK_S)
+		else if (e_.getKeyCode() == KeyEvent.VK_S && e_.isControlDown())
 		{
 			PNGDrawer.drawPNG(_drawPanel.getColorGrid(), 5);
 		}
