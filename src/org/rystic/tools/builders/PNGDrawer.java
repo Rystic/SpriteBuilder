@@ -26,8 +26,9 @@ public class PNGDrawer
 		RenderedImage image = createImage(colorGrid, pixelSize);
 		String fileName = JOptionPane
 				.showInputDialog("What would you like to save this file as?");
-		File file = new File((fileName.isEmpty() ? "newimage" : fileName)
-				+ ".png");
+		if (fileName == null || fileName.isEmpty())
+			return;
+		File file = new File(fileName + ".png");
 		try
 		{
 			ImageIO.write(image, "png", file);
@@ -43,8 +44,9 @@ public class PNGDrawer
 		int width = pixelSize;
 		int height = pixelSize;
 		// Create a buffered image in which to draw
-		BufferedImage bufferedImage = new BufferedImage(width * colorGrid.length,
-				height * colorGrid[0].length, BufferedImage.TYPE_INT_ARGB);
+		BufferedImage bufferedImage = new BufferedImage(width
+				* colorGrid.length, height * colorGrid[0].length,
+				BufferedImage.TYPE_INT_ARGB);
 
 		// Create a graphics contents on the buffered image
 		Graphics2D g2d = bufferedImage.createGraphics();
