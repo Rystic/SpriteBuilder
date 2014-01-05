@@ -8,9 +8,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 
 import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
@@ -29,6 +27,7 @@ import javax.swing.JToggleButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.rystic.tools.builders.BuilderMain;
 import org.rystic.tools.builders.PNGDrawer;
 
 @SuppressWarnings("serial")
@@ -36,7 +35,6 @@ public class ToolsPanel extends JPanel
 {
 	public ToolsPanel(SpriteBuilder parentBuilder)
 	{
-
 		_parentBuilder = parentBuilder;
 
 		// _fillButton.setIcon(new ImageIcon("fillTool.png"));
@@ -220,10 +218,20 @@ public class ToolsPanel extends JPanel
 			{
 				return;
 			}
-
-			Color[][] tiles = _parentBuilder.getDrawPanel().getColorGrid();
+			String pixelSizeString = JOptionPane.showInputDialog("Pixel Size?");
+			int pixelSize;
+			try
+			{
+				if (pixelSizeString == null || pixelSizeString.isEmpty())
+					pixelSize = BuilderMain._imageSize;
+				else
+					pixelSize = Integer.parseInt(pixelSizeString);
+			} catch (NumberFormatException e_)
+			{
+				pixelSize = BuilderMain._imageSize;
+			}
 			_parentBuilder.getDrawPanel().setColorGrid(
-					new Color[tiles.length][tiles[0].length]);
+					new Color[pixelSize][pixelSize]);
 		}
 
 	}
@@ -247,7 +255,7 @@ public class ToolsPanel extends JPanel
 					img = ImageIO.read(file);
 					Color[][] colorGrid = new Color[img.getWidth()][img
 							.getHeight()];
-					for (int i  = 0 ; i < img.getWidth(); i++)
+					for (int i = 0; i < img.getWidth(); i++)
 					{
 						for (int j = 0; j < img.getHeight(); j++)
 						{
