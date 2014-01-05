@@ -103,6 +103,8 @@ public class DrawPanel extends JPanel
 	public void
 	setColorGrid(Color[][] newColorGrid)
 	{
+		_width = newColorGrid.length;
+		_height = newColorGrid[0].length;
 		_colorGrid = newColorGrid;
 		repaint();
 	}

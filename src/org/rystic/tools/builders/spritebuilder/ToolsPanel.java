@@ -6,12 +6,13 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
+import java.io.IOException;
 import java.io.ObjectOutputStream;
 
+import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -29,7 +30,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.rystic.tools.builders.PNGDrawer;
-
 
 @SuppressWarnings("serial")
 public class ToolsPanel extends JPanel
@@ -51,9 +51,6 @@ public class ToolsPanel extends JPanel
 		_gridButton.addActionListener(new GridListener());
 		_gridButton.addKeyListener(new HotkeyListener(_parentBuilder));
 
-		_convertToPng.addActionListener(new PNGConverstionListener());
-		_convertToPng.addKeyListener(new HotkeyListener(_parentBuilder));
-
 		_colorChooser = new JColorChooser();
 
 		// menu bar
@@ -63,8 +60,8 @@ public class ToolsPanel extends JPanel
 		_newSpriteOption = new JMenuItem("New Sprite", new ImageIcon(
 				"art/newFileIcon.png"));
 		_newSpriteOption.addActionListener(new NewFileListener());
-		_saveOption = new JMenuItem("Save", new ImageIcon("art/saveIcon.png"));
-		_saveOption.addActionListener(new SaveFileListener());
+		_saveOption = new JMenuItem("(S)ave", new ImageIcon("art/saveIcon.png"));
+		_saveOption.addActionListener(new PNGConverstionListener());
 		_loadOption = new JMenuItem("Load", new ImageIcon("art/loadIcon.png"));
 		_loadOption.addActionListener(new LoadFileListener());
 		_exitOption = new JMenuItem("Exit");
@@ -129,10 +126,9 @@ public class ToolsPanel extends JPanel
 		buttonsPanel.add(_eraseButton);
 		buttonsPanel.add(_fillButton);
 		buttonsPanel.add(_gridButton);
-		buttonsPanel.add(_convertToPng);
+		buttonsPanel.add(_rotateButton);
 		buttonsPanel.add(_flipHoriztonalButton);
 		buttonsPanel.add(_flipVerticalButton);
-		buttonsPanel.add(_rotateButton);
 		add(buttonsPanel, BorderLayout.CENTER);
 
 	}
@@ -216,9 +212,10 @@ public class ToolsPanel extends JPanel
 		@Override
 		public void actionPerformed(ActionEvent e)
 		{
-			int confirm = JOptionPane.showConfirmDialog(
-					null,
-					"Are you sure you want to create a new sprite (unsaved changes will be discarded)?");
+			int confirm = JOptionPane
+					.showConfirmDialog(
+							null,
+							"Are you sure you want to create a new sprite (unsaved changes will be discarded)?");
 			if (confirm != 0)
 			{
 				return;
@@ -227,35 +224,6 @@ public class ToolsPanel extends JPanel
 			Color[][] tiles = _parentBuilder.getDrawPanel().getColorGrid();
 			_parentBuilder.getDrawPanel().setColorGrid(
 					new Color[tiles.length][tiles[0].length]);
-		}
-
-	}
-
-	private class SaveFileListener implements ActionListener
-	{
-
-		@Override
-		public void actionPerformed(ActionEvent e)
-		{
-			JFileChooser fileChooser = new JFileChooser();
-			fileChooser.showSaveDialog(ToolsPanel.this);
-			File file = fileChooser.getSelectedFile();
-			if (file == null)
-				return;
-			PrimitiveSprite sprite = new PrimitiveSprite(_parentBuilder
-					.getDrawPanel().getColorGrid());
-			try
-			{
-				FileOutputStream fileOut = new FileOutputStream(
-						file.getAbsolutePath() + ".ser");
-				ObjectOutputStream out = new ObjectOutputStream(fileOut);
-				out.writeObject(sprite);
-				out.close();
-			} catch (Exception e1)
-			{
-				System.out.println("Save failed. file=" + file + " exception="
-						+ e1.getMessage());
-			}
 		}
 
 	}
@@ -273,22 +241,31 @@ public class ToolsPanel extends JPanel
 				return;
 			try
 			{
-				FileInputStream fileIn = new FileInputStream(
-						file.getAbsoluteFile());
-				ObjectInputStream in = new ObjectInputStream(fileIn);
-				PrimitiveSprite sprite = (PrimitiveSprite) in.readObject();
-				in.close();
-				fileIn.close();
-				_parentBuilder.getDrawPanel().setColorGrid(
-						sprite.getColorGrid());
-				_parentBuilder.getDrawPanel().repaint();
+				BufferedImage img = null;
+				try
+				{
+					img = ImageIO.read(file);
+					Color[][] colorGrid = new Color[img.getWidth()][img
+							.getHeight()];
+					for (int i  = 0 ; i < img.getWidth(); i++)
+					{
+						for (int j = 0; j < img.getHeight(); j++)
+						{
+							colorGrid[i][j] = new Color(img.getRGB(i, j));
+						}
+					}
+					_parentBuilder.getDrawPanel().setColorGrid(colorGrid);
+					_parentBuilder.getDrawPanel().repaint();
+				} catch (IOException e2_)
+				{
+				}
+
 			} catch (Exception e1)
 			{
 				System.out.println("Load failed. file=" + file + " exception="
 						+ e1.getMessage());
 			}
 		}
-
 	}
 
 	private class ExitListener implements ActionListener
@@ -391,15 +368,15 @@ public class ToolsPanel extends JPanel
 			int height = tiles[0].length;
 			for (int i = 0; i < height; i++)
 			{
-				for (int j = width - 1; j >= 0; j--)
+				for (int j = 0; j < width; j++)
 				{
-					newTiles[i][tiles.length - 1 - j] = tiles[j][i];
+					newTiles[j][i] = tiles[height - i - 1][j];
 				}
 			}
 			_parentBuilder.getDrawPanel().setColorGrid(newTiles);
 		}
 	}
-	
+
 	private class IconListener implements ActionListener
 	{
 		@Override
@@ -432,7 +409,6 @@ public class ToolsPanel extends JPanel
 	private JToggleButton _fillButton = new JToggleButton("(F)ill");
 	private JToggleButton _gridButton = new JToggleButton("(G)rid");
 
-	private JButton _convertToPng = new JButton("(C)onvert to .png");
 	private JButton _flipHoriztonalButton = new JButton("Flip Horizontal");
 	private JButton _flipVerticalButton = new JButton("Flip Vertical");
 	private JButton _rotateButton = new JButton("Rotate CCW");

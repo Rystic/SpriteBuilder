@@ -36,7 +36,7 @@ public class HotkeyListener implements KeyListener
 		{
 			_drawPanel.undo();
 		}
-		else if (e_.getKeyCode() == KeyEvent.VK_C)
+		else if (e_.getKeyCode() == KeyEvent.VK_S)
 		{
 			PNGDrawer.drawPNG(_drawPanel.getColorGrid(), 5);
 		}

@@ -42,17 +42,16 @@ public class PNGDrawer
 	{
 		int width = pixelSize;
 		int height = pixelSize;
-		int imageSize = BuilderMain.IMAGE_SIZE;
 		// Create a buffered image in which to draw
-		BufferedImage bufferedImage = new BufferedImage(width * imageSize,
-				height * imageSize, BufferedImage.TYPE_INT_ARGB);
+		BufferedImage bufferedImage = new BufferedImage(width * colorGrid.length,
+				height * colorGrid[0].length, BufferedImage.TYPE_INT_ARGB);
 
 		// Create a graphics contents on the buffered image
 		Graphics2D g2d = bufferedImage.createGraphics();
 
-		for (int w = 0; w < imageSize; w++)
+		for (int w = 0; w < colorGrid.length; w++)
 		{
-			for (int h = 0; h < imageSize; h++)
+			for (int h = 0; h < colorGrid[0].length; h++)
 			{
 				if (colorGrid[w][h] == null)
 				{
