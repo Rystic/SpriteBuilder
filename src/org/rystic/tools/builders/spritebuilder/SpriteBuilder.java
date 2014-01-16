@@ -6,9 +6,6 @@ import java.awt.Point;
 import java.awt.Toolkit;
 
 import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JTabbedPane;
 
 import org.rystic.tools.builders.spritebuilder.panels.DrawPanel;
@@ -20,14 +17,6 @@ public class SpriteBuilder
 {
 	public SpriteBuilder(int width, int height)
 	{
-
-		_frameMenuBar.add(_frameMenu);
-		_frameMenu.add(new JMenuItem("(A)dd Frame"));
-		_frameMenu.add(new JMenuItem("(C)opy Frame to New Frame"));
-		_frameMenu.add(new JMenuItem("(R)emove Frame"));
-		_frameMenu.add(_frameMenuBar);
-		_frameMenu.setVisible(true);
-
 		_toolPanelFrame.add(_toolsPanel);
 		_toolPanelFrame.setTitle("Tools Panel");
 		_toolPanelFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -59,7 +48,6 @@ public class SpriteBuilder
 
 		_drawPanelFrame.setLocation(_toolPanelFrame.getX()
 				+ _toolPanelFrame.getWidth(), 0);
-		_drawPanelFrame.setJMenuBar(_frameMenuBar);
 		_drawPanelFrame.setSize(600, 600);
 		_drawPanelFrame.add(_drawPanelTabbedPane);
 		_drawPanelFrame.setTitle("Draw Panel");
@@ -73,7 +61,7 @@ public class SpriteBuilder
 		boolean fillOn = _toolsPanel.isFill();
 		Toolkit toolkit = Toolkit.getDefaultToolkit();
 		Image fillCursor = toolkit.getImage("art/fillTool.png");
-		Image eraseCursor = toolkit.getImage("art/eraseTool.png");
+		Image eraseCursor = toolkit.getImage("art/eraserIcon.png");
 		Image fillPlusEraseCursor = toolkit.getImage("art/fillPlusEraseTool.png");
 		Image eyeDroperCursor = toolkit.getImage("art/eyeDropperTool.png");
 
@@ -159,11 +147,8 @@ public class SpriteBuilder
 	
 	public static void main(String[] args)
 	{
-		 new SpriteBuilder(SpriteBuilderConstants.DEFAULT_IMAGE_SIZE, SpriteBuilderConstants.DEFAULT_IMAGE_SIZE);
+		 new SpriteBuilder(BuilderConstants.DEFAULT_IMAGE_SIZE, BuilderConstants.DEFAULT_IMAGE_SIZE);
 	}
-
-	private JMenuBar _frameMenuBar = new JMenuBar();
-	private JMenu _frameMenu = new JMenu("Frame Actions");
 
 	private JTabbedPane _drawPanelTabbedPane = new JTabbedPane();
 

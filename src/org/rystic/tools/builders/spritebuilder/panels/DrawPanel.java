@@ -3,6 +3,7 @@ package org.rystic.tools.builders.spritebuilder.panels;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -235,14 +236,14 @@ public class DrawPanel extends JPanel
 
 		private void fill(int x, int y)
 		{
-			LinkedList<IntegerPair> tiles = new LinkedList<IntegerPair>();
-			tiles.add(new IntegerPair(x, y));
+			LinkedList<Point> tiles = new LinkedList<Point>();
+			tiles.add(new Point(x, y));
 
 			while (tiles.size() > 0)
 			{
-				IntegerPair tile = tiles.pop();
-				int tileX = tile._a;
-				int tileY = tile._b;
+				Point tile = tiles.pop();
+				int tileX = tile.x;
+				int tileY = tile.y;
 				if (tileY >= _height || tileY < 0 || tileX >= _width
 						|| tileX < 0)
 					continue;
@@ -258,10 +259,10 @@ public class DrawPanel extends JPanel
 				{
 					replaceColor(tileX, tileY, _newColor);
 
-					tiles.add(new IntegerPair(tileX - 1, tileY));
-					tiles.add(new IntegerPair(tileX + 1, tileY));
-					tiles.add(new IntegerPair(tileX, tileY - 1));
-					tiles.add(new IntegerPair(tileX, tileY + 1));
+					tiles.add(new Point(tileX - 1, tileY));
+					tiles.add(new Point(tileX + 1, tileY));
+					tiles.add(new Point(tileX, tileY - 1));
+					tiles.add(new Point(tileX, tileY + 1));
 				}
 			}
 		}
@@ -289,14 +290,14 @@ public class DrawPanel extends JPanel
 	private class PreviousDrawAction
 	{
 		private final Color _prevColor;
-		private final IntegerPair _xy;
+		private final Point _xy;
 
 		private PreviousDrawAction _next;
 		private int _undoGeneration;
 
 		public PreviousDrawAction(int x, int y, Color prevColor)
 		{
-			_xy = new IntegerPair(x, y);
+			_xy = new Point(x, y);
 			_prevColor = prevColor;
 			_undoGeneration = 0;
 		}
@@ -321,7 +322,7 @@ public class DrawPanel extends JPanel
 		{
 			if (_undoGeneration <= 1)
 			{
-				_colorGrid[_xy._a][_xy._b] = _prevColor;
+				_colorGrid[_xy.x][_xy.y] = _prevColor;
 				if (_head.equals(this))
 				{
 					_head = _head._next;
@@ -344,18 +345,6 @@ public class DrawPanel extends JPanel
 		}
 	}
 
-	private class IntegerPair
-	{
-		int _a;
-		int _b;
-
-		public IntegerPair(int a_, int b_)
-		{
-			_a = a_;
-			_b = b_;
-		}
-	}
-	
 	private Dimension _tileDim = new Dimension(20, 20);
 
 	private Color[][] _colorGrid;

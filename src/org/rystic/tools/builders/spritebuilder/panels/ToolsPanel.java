@@ -30,7 +30,7 @@ import javax.swing.event.ChangeListener;
 
 import org.bushe.swing.event.EventSubscriber;
 import org.rystic.tools.builders.spritebuilder.SpriteBuilder;
-import org.rystic.tools.builders.spritebuilder.SpriteBuilderConstants;
+import org.rystic.tools.builders.spritebuilder.BuilderConstants;
 import org.rystic.tools.builders.spritebuilder.panels.events.HotKeyEvent;
 import org.rystic.tools.builders.spritebuilder.panels.util.PNGDrawer;
 
@@ -72,7 +72,7 @@ public class ToolsPanel extends JPanel implements EventSubscriber<HotKeyEvent>
 				KeyEvent.VK_S,
 				ActionEvent.CTRL_MASK));
 
-		_loadOption = new JMenuItem("Load",new ImageIcon(
+		_loadOption = new JMenuItem("Load", new ImageIcon(
 				"art/loadIconMedium.png"));
 		_loadOption.setMnemonic(KeyEvent.VK_L);
 		_loadOption.setAccelerator(KeyStroke.getKeyStroke(
@@ -101,6 +101,9 @@ public class ToolsPanel extends JPanel implements EventSubscriber<HotKeyEvent>
 		_pixelSizeSlider.setValue(DEFAULT_PIXEL_SIZE);
 		_pixelSizeSlider.addChangeListener(new PixelSizeListener());
 		_pixelSizeLabel = new JLabel();
+
+		_brushSizeSlider = new JSlider();
+		_brushSizeSlider.setValue(DEFAULT_BRUSH_SIZE);
 
 		_viewMenu.add(_previewMenuOption);
 		_viewMenu.add(_drawMenuOption);
@@ -132,8 +135,8 @@ public class ToolsPanel extends JPanel implements EventSubscriber<HotKeyEvent>
 
 		pixelAdjust.setLayout(new BoxLayout(pixelAdjust, BoxLayout.Y_AXIS));
 
-		_pixelSizeLabel.setText("Block Size: " + _pixelSizeSlider.getValue()
-				+ " px");
+		_pixelSizeLabel.setText("Pixels per Block: "
+				+ _pixelSizeSlider.getValue() + " px");
 		_pixelSizeLabel.setAlignmentY(200f);
 
 		pixelAdjust.add(_pixelSizeLabel);
@@ -238,19 +241,19 @@ public class ToolsPanel extends JPanel implements EventSubscriber<HotKeyEvent>
 			}
 			String pixelSizeString = JOptionPane
 					.showInputDialog("Pixel Size? (default "
-							+ SpriteBuilderConstants.DEFAULT_IMAGE_SIZE + "px)");
+							+ BuilderConstants.DEFAULT_IMAGE_SIZE + "px)");
 			int pixelSize;
 			try
 			{
 				if (pixelSizeString == null || pixelSizeString.isEmpty())
-					pixelSize = SpriteBuilderConstants.DEFAULT_IMAGE_SIZE;
+					pixelSize = BuilderConstants.DEFAULT_IMAGE_SIZE;
 				else
 					pixelSize = Integer.parseInt(pixelSizeString);
 				if (pixelSize < 0)
-					pixelSize = SpriteBuilderConstants.DEFAULT_IMAGE_SIZE;
+					pixelSize = BuilderConstants.DEFAULT_IMAGE_SIZE;
 			} catch (NumberFormatException e_)
 			{
-				pixelSize = SpriteBuilderConstants.DEFAULT_IMAGE_SIZE;
+				pixelSize = BuilderConstants.DEFAULT_IMAGE_SIZE;
 			}
 			_parentBuilder.getDrawPanel().setColorGrid(
 					new Color[pixelSize][pixelSize]);
@@ -334,11 +337,10 @@ public class ToolsPanel extends JPanel implements EventSubscriber<HotKeyEvent>
 
 	private class PixelSizeListener implements ChangeListener
 	{
-
 		@Override
 		public void stateChanged(ChangeEvent e)
 		{
-			_pixelSizeLabel.setText("Block Size: "
+			_pixelSizeLabel.setText("Pixels per Block: "
 					+ _pixelSizeSlider.getValue() + " px");
 			_parentBuilder.getPreviewPanel().repaint();
 		}
@@ -423,6 +425,7 @@ public class ToolsPanel extends JPanel implements EventSubscriber<HotKeyEvent>
 	}
 
 	private static int DEFAULT_PIXEL_SIZE = 1;
+	private static int DEFAULT_BRUSH_SIZE = 1;
 
 	private JMenuBar _menuBar;
 
@@ -439,6 +442,7 @@ public class ToolsPanel extends JPanel implements EventSubscriber<HotKeyEvent>
 	private JLabel _pixelSizeLabel;
 
 	private JSlider _pixelSizeSlider;
+	private JSlider _brushSizeSlider;
 
 	private JColorChooser _colorChooser;
 	private JToggleButton _eraseButton = new JToggleButton("(E)rase");
