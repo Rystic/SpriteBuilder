@@ -3,33 +3,32 @@ package org.rystic.tools.builders.spritebuilder.panels;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.LinkedList;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import org.rystic.tools.builders.spritebuilder.SpriteBuilder;
+import org.bushe.swing.event.EventBus;
+import org.rystic.tools.builders.spritebuilder.BuilderModel;
+import org.rystic.tools.builders.spritebuilder.panels.events.RepaintEvent;
 
 @SuppressWarnings("serial")
-public class DrawPanel extends JPanel
+public class DrawPanel extends AbstractBuilderPanel
 {
-	public DrawPanel(int width, int height, SpriteBuilder parentBuilder)
+	public DrawPanel(BuilderModel model_)
 	{
-		_width = width;
-		_height = height;
-		
-		_parentBuilder = parentBuilder;
-		_drawPanelFrame = _parentBuilder.getDrawFrame();
-		_toolsPanel = _parentBuilder.getToolsPanel();
-	
-		_colorGrid = new Color[width][height];
-
+		super(model_);
 		_incrementGeneration = false;
-		
+	}
+
+	//
+	@Override
+	public void addListeners()
+	{
 		addMouseMotionListener(new DrawListener());
 		addMouseListener(new DrawListener());
 	}
@@ -40,26 +39,29 @@ public class DrawPanel extends JPanel
 		g.setColor(getBackground());
 		g.fillRect(0, 0, 2000, 2000);
 
-		_tileDim.width = _drawPanelFrame.getWidth() / _width;
-		_tileDim.height = _drawPanelFrame.getHeight() / _height;
+		JFrame parent = (JFrame) SwingUtilities.getWindowAncestor(this);
 
-		while (_tileDim.width * _width > _drawPanelFrame.getWidth() - 15)
+		_tileDim.width = parent.getWidth() / _model.getGridWidth();
+		_tileDim.height = parent.getHeight() / _model.getGridHeight();
+
+		Color[][] colorGrid = _model.getColorGrid();
+
+		while (_tileDim.width * _model.getGridWidth() > parent.getWidth() - 15)
 		{
 			_tileDim.width--;
 		}
 
-		while (_tileDim.height * _height > _drawPanelFrame
-				.getHeight() - 100)
+		while (_tileDim.height * _model.getGridHeight() > parent.getHeight() - 100)
 		{
 			_tileDim.height--;
 		}
 
-		for (int w = 0; w < _width; w++)
+		for (int w = 0; w < _model.getGridWidth(); w++)
 		{
-			for (int h = 0; h < _height; h++)
+			for (int h = 0; h < _model.getGridHeight(); h++)
 			{
 				g.setColor(Color.BLACK);
-				if (!_toolsPanel.isGrid())
+				if (!_model.isGrid())
 					g.setColor(Color.WHITE);
 
 				g.clearRect(
@@ -73,9 +75,9 @@ public class DrawPanel extends JPanel
 						_tileDim.width,
 						_tileDim.height);
 
-				if (_colorGrid[w][h] != null)
+				if (colorGrid[w][h] != null)
 				{
-					g.setColor(_colorGrid[w][h]);
+					g.setColor(colorGrid[w][h]);
 					g.fillRect(
 							w * _tileDim.width,
 							h * _tileDim.height,
@@ -84,8 +86,6 @@ public class DrawPanel extends JPanel
 				}
 			}
 		}
-		_parentBuilder.getPreviewPanel().updatePreview(_colorGrid);
-		_parentBuilder.calculateCursor();
 	}
 
 	public void undo()
@@ -97,22 +97,7 @@ public class DrawPanel extends JPanel
 		}
 	}
 
-	public Color[][] getColorGrid()
-	{
-		return _colorGrid;
-	}
-	
-	public void
-	setColorGrid(Color[][] newColorGrid)
-	{
-		_width = newColorGrid.length;
-		_height = newColorGrid[0].length;
-		_colorGrid = newColorGrid;
-		repaint();
-	}
-
-	private class DrawListener implements MouseMotionListener,
-			MouseListener
+	private class DrawListener implements MouseMotionListener, MouseListener
 	{
 
 		private Color _newColor;
@@ -124,7 +109,8 @@ public class DrawPanel extends JPanel
 			int x = e.getX() / _tileDim.width;
 			int y = e.getY() / _tileDim.height;
 
-			if (x >= 0 && y >= 0 && x < _width && y < _height)
+			if (x >= 0 && y >= 0 && x < _model.getGridWidth()
+					&& y < _model.getGridHeight())
 			{
 				if (SwingUtilities.isRightMouseButton(e))
 				{
@@ -133,13 +119,13 @@ public class DrawPanel extends JPanel
 				else
 				{
 					replaceColor(
-						x,
+							x,
 							y,
-							_toolsPanel.isErase() ? null : _toolsPanel
-									.getColor());
+							_model.isEraser() ? null : _model
+									.getSelectedColor());
 				}
 			}
-			_toolsPanel.repaint();
+			EventBus.publish(new RepaintEvent());
 			repaint();
 		}
 
@@ -173,9 +159,14 @@ public class DrawPanel extends JPanel
 		@Override
 		public void mousePressed(MouseEvent arg0)
 		{
+			Point click = new Point(arg0.getX(), arg0.getY());
+
+			Color[][] colorGrid = _model.getColorGrid();
+
 			int x = arg0.getX() / _tileDim.width;
 			int y = arg0.getY() / _tileDim.height;
-			if (x >= 0 && y >= 0 && x < _width && y < _height)
+			if (x >= 0 && y >= 0 && x < _model.getGridWidth()
+					&& y < _model.getGridHeight())
 			{
 				if (arg0.getButton() == MouseEvent.BUTTON3)
 				{
@@ -183,18 +174,15 @@ public class DrawPanel extends JPanel
 				}
 				else
 				{
-					_oldColor = _colorGrid[x][y] == null ? null : new Color(
-							_colorGrid[x][y].getRed(),
-							_colorGrid[x][y].getGreen(),
-							_colorGrid[x][y].getBlue(), 255);
+					_oldColor = colorGrid[x][y] == null ? null : colorGrid[x][y];
 					replaceColor(
 							x,
 							y,
-							_toolsPanel.isErase() ? null : _toolsPanel
-									.getColor());
-					if (_toolsPanel.isFill())
+							_model.isEraser() ? null : _model
+									.getSelectedColor());
+					if (_model.isFill())
 					{
-						_newColor = _colorGrid[x][y];
+						_newColor = colorGrid[x][y];
 						fill(x - 1, y);
 						fill(x + 1, y);
 						fill(x, y - 1);
@@ -202,17 +190,14 @@ public class DrawPanel extends JPanel
 					}
 				}
 			}
-			_toolsPanel.repaint();
-			repaint();
+			EventBus.publish(new RepaintEvent());
 		}
 
 		@Override
 		public void mouseReleased(MouseEvent arg0)
 		{
-			_parentBuilder.setEyedropper(false);
-			_parentBuilder.calculateCursor();
-			_toolsPanel.repaint();
-			repaint();
+			_model.setEyedropper(false);
+			EventBus.publish(new RepaintEvent());
 			if (_head != null && _incrementGeneration)
 			{
 				_head.incrementGeneration();
@@ -222,81 +207,83 @@ public class DrawPanel extends JPanel
 
 		private void colorGrab(int x, int y)
 		{
-			_parentBuilder.setEyedropper(true);
+			_model.setEyedropper(true);
+			Color[][] _colorGrid = _model.getColorGrid();
+
 			if (_colorGrid[x][y] == null)
 			{
-				_toolsPanel.setErase(true);
+				_model.setEraser(true);
 				return;
 			}
-			_toolsPanel.setErase(false);
+			_model.setEraser(false);
 			Color newColor = _colorGrid[x][y];
-			_toolsPanel.setColor(newColor);
+			_model.setSelectedColor(newColor);
 		}
 
 		private void fill(int x, int y)
 		{
-			LinkedList<IntegerPair> tiles = new LinkedList<IntegerPair>();
-			tiles.add(new IntegerPair(x, y));
+			LinkedList<Point> tiles = new LinkedList<Point>();
+			tiles.add(new Point(x, y));
+
+			Color[][] colorGrid = _model.getColorGrid();
 
 			while (tiles.size() > 0)
 			{
-				IntegerPair tile = tiles.pop();
-				int tileX = tile._a;
-				int tileY = tile._b;
-				if (tileY >= _height || tileY < 0 || tileX >= _width
-						|| tileX < 0)
+				Point tile = tiles.pop();
+				int tileX = tile.x;
+				int tileY = tile.y;
+				if (tileY >= _model.getGridHeight() || tileY < 0
+						|| tileX >= _model.getGridWidth() || tileX < 0)
 					continue;
 				if ((_newColor == null && _oldColor == null)
 						|| (_newColor != null && _oldColor != null && _newColor
 								.equals(_oldColor)))
 					continue;
 
-				boolean isReplaced = _colorGrid[tileX][tileY] == null ? _oldColor == null : _colorGrid[tileX][tileY]
+				boolean isReplaced = colorGrid[tileX][tileY] == null ? _oldColor == null : colorGrid[tileX][tileY]
 						.equals(_oldColor);
 
 				if (isReplaced)
 				{
 					replaceColor(tileX, tileY, _newColor);
 
-					tiles.add(new IntegerPair(tileX - 1, tileY));
-					tiles.add(new IntegerPair(tileX + 1, tileY));
-					tiles.add(new IntegerPair(tileX, tileY - 1));
-					tiles.add(new IntegerPair(tileX, tileY + 1));
+					tiles.add(new Point(tileX - 1, tileY));
+					tiles.add(new Point(tileX + 1, tileY));
+					tiles.add(new Point(tileX, tileY - 1));
+					tiles.add(new Point(tileX, tileY + 1));
 				}
 			}
 		}
 
-		private void replaceColor(int x, int y, Color newColor)
+		private void replaceColor(int x_, int y_, Color newColor_)
 		{
-			if ((newColor == null && _colorGrid[x][y] == null)
-					|| (newColor != null && newColor
-							.equals(_colorGrid[x][y])))
+			Color[][] colorGrid = _model.getColorGrid();
+			if ((newColor_ == null && colorGrid[x_][y_] == null)
+					|| (newColor_ != null && newColor_
+							.equals(colorGrid[x_][y_])))
 				return;
 			_incrementGeneration = true;
-			PreviousDrawAction prev = new PreviousDrawAction(x, y,
-					_colorGrid[x][y] == null ? null : new Color(
-							_colorGrid[x][y].getRed(),
-							_colorGrid[x][y].getGreen(),
-							_colorGrid[x][y].getBlue()));
+			PreviousDrawAction prev = new PreviousDrawAction(x_, y_,
+					colorGrid[x_][y_] == null ? null : colorGrid[x_][y_]);
 			if (_head == null)
 				_head = prev;
 			else
 				_head.add(prev);
-			_colorGrid[x][y] = newColor;
+			_model.setColorAt(x_, y_, newColor_);
 		}
 	}
 
 	private class PreviousDrawAction
 	{
 		private final Color _prevColor;
-		private final IntegerPair _xy;
+		private final Point _xy;
 
 		private PreviousDrawAction _next;
 		private int _undoGeneration;
 
 		public PreviousDrawAction(int x, int y, Color prevColor)
 		{
-			_xy = new IntegerPair(x, y);
+			_xy = new Point(x, y);
 			_prevColor = prevColor;
 			_undoGeneration = 0;
 		}
@@ -319,9 +306,10 @@ public class DrawPanel extends JPanel
 
 		public void decrementGeneration()
 		{
+			Color[][] colorGrid = _model.getColorGrid();
 			if (_undoGeneration <= 1)
 			{
-				_colorGrid[_xy._a][_xy._b] = _prevColor;
+				colorGrid[_xy.x][_xy.y] = _prevColor;
 				if (_head.equals(this))
 				{
 					_head = _head._next;
@@ -344,30 +332,10 @@ public class DrawPanel extends JPanel
 		}
 	}
 
-	private class IntegerPair
-	{
-		int _a;
-		int _b;
-
-		public IntegerPair(int a_, int b_)
-		{
-			_a = a_;
-			_b = b_;
-		}
-	}
-	
 	private Dimension _tileDim = new Dimension(20, 20);
-
-	private Color[][] _colorGrid;
 
 	private PreviousDrawAction _head;
 
 	private boolean _incrementGeneration;
 
-	private int _width;
-	private int _height;
-		
-	private SpriteBuilder _parentBuilder;
-	private JFrame _drawPanelFrame;
-	private ToolsPanel _toolsPanel;
 }

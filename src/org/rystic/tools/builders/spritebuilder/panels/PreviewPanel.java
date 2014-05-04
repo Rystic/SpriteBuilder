@@ -3,76 +3,55 @@ package org.rystic.tools.builders.spritebuilder.panels;
 import java.awt.Color;
 import java.awt.Graphics;
 
-import javax.swing.JPanel;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
-import org.rystic.tools.builders.spritebuilder.SpriteBuilder;
+import org.rystic.tools.builders.spritebuilder.BuilderModel;
 
-public class PreviewPanel extends JPanel
+@SuppressWarnings("serial")
+public class PreviewPanel extends AbstractBuilderPanel
 {
-
-	public PreviewPanel(int width_, int height_, SpriteBuilder parentBuilder_)
+	public PreviewPanel(BuilderModel model_)
 	{
-		_gridWidth = width_;
-		_gridHeight = height_;
-		_parentBuilder = parentBuilder_;
-
+		super(model_);
 		_pixelSize = 8;
 	}
-
-	public void updatePreview(Color[][] colorGrid_)
+	
+	@Override
+	public void addListeners()
 	{
-		_colorGrid = colorGrid_;
-		_gridWidth = colorGrid_[0].length;
-		_gridHeight = colorGrid_[1].length;
-		repaint();
+		
 	}
 
 	protected void paintComponent(Graphics g_)
 	{
-		_pixelSize = _parentBuilder.getToolsPanel().getPixelSize();
-		if (_colorGrid == null)
-			return;
+		_pixelSize = _model.getPixelSize();
+		JFrame parent = (JFrame) SwingUtilities.getWindowAncestor(this);
+
+		Color[][] colorGrid = _model.getColorGrid();
+		
 		g_.setColor(getBackground());
 		g_.fillRect(0, 0, 2000, 2000);
 
 		int widthStart = 0;
 		int heightStart = 0;
 
-		_parentBuilder.getPreviewFrame().setSize(
-				_pixelSize * _gridWidth + 15,
-				_pixelSize * _gridHeight + 38);
+		parent.setSize(
+				_pixelSize * _model.getGridWidth() + 15,
+				_pixelSize * _model.getGridHeight() + 38);
 
-		for (int w = 0; w < _gridWidth; w++)
+		for (int width = 0; width < _model.getGridWidth(); width++)
 		{
-			for (int h = 0; h < _gridHeight; h++)
+			for (int height = 0; height < _model.getGridHeight(); height++)
 			{
-				if (_colorGrid[w][h] == null)
+				if (colorGrid[width][height] == null)
 					continue;
-				g_.setColor(_colorGrid[w][h]);
-				g_.fillRect(widthStart + (w * _pixelSize), heightStart
-						+ (h * _pixelSize), _pixelSize, _pixelSize);
+				g_.setColor(_model.getColorGrid()[width][height]);
+				g_.fillRect(widthStart + (width * _pixelSize), heightStart
+						+ (height * _pixelSize), _pixelSize, _pixelSize);
 			}
 		}
 	}
 
-	public int getPixelSize()
-	{
-		return _pixelSize;
-	}
-	
-	public void setPixelSize(int pixelSize_)
-	{
-		_pixelSize = pixelSize_;
-	}
-
-	private static final long serialVersionUID = 1L;
-
-	private Color[][] _colorGrid;
-
-	private int _gridWidth;
-	private int _gridHeight;
 	private int _pixelSize;
-
-	private SpriteBuilder _parentBuilder;
-
 }

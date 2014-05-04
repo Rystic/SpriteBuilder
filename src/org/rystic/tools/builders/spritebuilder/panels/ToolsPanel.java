@@ -16,6 +16,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -25,32 +26,34 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.bushe.swing.event.EventSubscriber;
-import org.rystic.tools.builders.spritebuilder.SpriteBuilder;
-import org.rystic.tools.builders.spritebuilder.SpriteBuilderConstants;
-import org.rystic.tools.builders.spritebuilder.panels.events.HotKeyEvent;
+import org.bushe.swing.event.EventBus;
+import org.rystic.tools.builders.spritebuilder.BuilderConstants;
+import org.rystic.tools.builders.spritebuilder.BuilderModel;
+import org.rystic.tools.builders.spritebuilder.panels.events.RepaintEvent;
 import org.rystic.tools.builders.spritebuilder.panels.util.PNGDrawer;
 
 @SuppressWarnings("serial")
-public class ToolsPanel extends JPanel implements EventSubscriber<HotKeyEvent>
+public class ToolsPanel extends AbstractBuilderPanel
 {
-	public ToolsPanel(SpriteBuilder parentBuilder)
+	public ToolsPanel(BuilderModel model_)
 	{
-		_parentBuilder = parentBuilder;
+		super(model_);
 
 		// _fillButton.setIcon(new ImageIcon("fillTool.png"));
-		_fillButton.addActionListener(new IconListener());
+		// _fillButton.addActionListener(new IconListener());
 
 		// _eraseButton.setIcon(new ImageIcon("eraseTool.png"));
-		_eraseButton.addActionListener(new IconListener());
+		// _eraseButton.addActionListener(new IconListener());
 
 		_gridButton.setSelected(true);
 		_gridButton.addActionListener(new GridListener());
 
 		_colorChooser = new JColorChooser();
+		_model.setColorChooser(_colorChooser);
 
 		// menu bar
 
@@ -72,7 +75,7 @@ public class ToolsPanel extends JPanel implements EventSubscriber<HotKeyEvent>
 				KeyEvent.VK_S,
 				ActionEvent.CTRL_MASK));
 
-		_loadOption = new JMenuItem("Load",new ImageIcon(
+		_loadOption = new JMenuItem("Load", new ImageIcon(
 				"art/loadIconMedium.png"));
 		_loadOption.setMnemonic(KeyEvent.VK_L);
 		_loadOption.setAccelerator(KeyStroke.getKeyStroke(
@@ -101,6 +104,9 @@ public class ToolsPanel extends JPanel implements EventSubscriber<HotKeyEvent>
 		_pixelSizeSlider.setValue(DEFAULT_PIXEL_SIZE);
 		_pixelSizeSlider.addChangeListener(new PixelSizeListener());
 		_pixelSizeLabel = new JLabel();
+
+		_brushSizeSlider = new JSlider();
+		_brushSizeSlider.setValue(DEFAULT_BRUSH_SIZE);
 
 		_viewMenu.add(_previewMenuOption);
 		_viewMenu.add(_drawMenuOption);
@@ -132,8 +138,8 @@ public class ToolsPanel extends JPanel implements EventSubscriber<HotKeyEvent>
 
 		pixelAdjust.setLayout(new BoxLayout(pixelAdjust, BoxLayout.Y_AXIS));
 
-		_pixelSizeLabel.setText("Block Size: " + _pixelSizeSlider.getValue()
-				+ " px");
+		_pixelSizeLabel.setText("Pixels per Block: "
+				+ _pixelSizeSlider.getValue() + " px");
 		_pixelSizeLabel.setAlignmentY(200f);
 
 		pixelAdjust.add(_pixelSizeLabel);
@@ -204,22 +210,19 @@ public class ToolsPanel extends JPanel implements EventSubscriber<HotKeyEvent>
 		@Override
 		public void actionPerformed(ActionEvent arg0)
 		{
-			PNGDrawer.drawPNG(
-					_parentBuilder.getDrawPanel().getColorGrid(),
-					_parentBuilder.getPreviewPanel().getPixelSize());
+			PNGDrawer.drawPNG(_model.getColorGrid(), _model.getPixelSize());
 		}
 
 	}
 
 	private class GridListener implements ActionListener
 	{
-
 		@Override
 		public void actionPerformed(ActionEvent arg0)
 		{
-			_parentBuilder.getDrawPanel().repaint();
+			_model.setGrid(_gridButton.isSelected());
+			EventBus.publish(new RepaintEvent());
 		}
-
 	}
 
 	private class NewFileListener implements ActionListener
@@ -238,22 +241,21 @@ public class ToolsPanel extends JPanel implements EventSubscriber<HotKeyEvent>
 			}
 			String pixelSizeString = JOptionPane
 					.showInputDialog("Pixel Size? (default "
-							+ SpriteBuilderConstants.DEFAULT_IMAGE_SIZE + "px)");
+							+ BuilderConstants.DEFAULT_IMAGE_SIZE + "px)");
 			int pixelSize;
 			try
 			{
 				if (pixelSizeString == null || pixelSizeString.isEmpty())
-					pixelSize = SpriteBuilderConstants.DEFAULT_IMAGE_SIZE;
+					pixelSize = BuilderConstants.DEFAULT_IMAGE_SIZE;
 				else
 					pixelSize = Integer.parseInt(pixelSizeString);
 				if (pixelSize < 0)
-					pixelSize = SpriteBuilderConstants.DEFAULT_IMAGE_SIZE;
+					pixelSize = BuilderConstants.DEFAULT_IMAGE_SIZE;
 			} catch (NumberFormatException e_)
 			{
-				pixelSize = SpriteBuilderConstants.DEFAULT_IMAGE_SIZE;
+				pixelSize = BuilderConstants.DEFAULT_IMAGE_SIZE;
 			}
-			_parentBuilder.getDrawPanel().setColorGrid(
-					new Color[pixelSize][pixelSize]);
+			_model.setColorGrid(new Color[pixelSize][pixelSize]);
 		}
 
 	}
@@ -284,8 +286,8 @@ public class ToolsPanel extends JPanel implements EventSubscriber<HotKeyEvent>
 							colorGrid[i][j] = new Color(img.getRGB(i, j));
 						}
 					}
-					_parentBuilder.getDrawPanel().setColorGrid(colorGrid);
-					_parentBuilder.getDrawPanel().repaint();
+					_model.setColorGrid(colorGrid);
+					EventBus.publish(new RepaintEvent());
 				} catch (IOException e2_)
 				{
 				}
@@ -317,10 +319,12 @@ public class ToolsPanel extends JPanel implements EventSubscriber<HotKeyEvent>
 		@Override
 		public void actionPerformed(ActionEvent e)
 		{
+			JFrame parent = (JFrame) SwingUtilities
+					.getWindowAncestor(ToolsPanel.this);
 			if (_panelType.equals(PANEL_PREVIEW))
-				_parentBuilder.getPreviewFrame().setVisible(true);
+				parent.setVisible(true);
 			else if (_panelType.equals(PANEL_DRAW))
-				_parentBuilder.getDrawFrame().setVisible(true);
+				parent.setVisible(true);
 			else
 				System.out.println("Unknown panel type.");
 
@@ -334,13 +338,12 @@ public class ToolsPanel extends JPanel implements EventSubscriber<HotKeyEvent>
 
 	private class PixelSizeListener implements ChangeListener
 	{
-
 		@Override
 		public void stateChanged(ChangeEvent e)
 		{
-			_pixelSizeLabel.setText("Block Size: "
+			_pixelSizeLabel.setText("Pixels per Block: "
 					+ _pixelSizeSlider.getValue() + " px");
-			_parentBuilder.getPreviewPanel().repaint();
+			EventBus.publish(new RepaintEvent());
 		}
 
 	}
@@ -350,7 +353,7 @@ public class ToolsPanel extends JPanel implements EventSubscriber<HotKeyEvent>
 		@Override
 		public void actionPerformed(ActionEvent e)
 		{
-			Color[][] tiles = _parentBuilder.getDrawPanel().getColorGrid();
+			Color[][] tiles = _model.getColorGrid();
 			Color[][] newTiles = new Color[tiles.length][tiles[0].length];
 			int width = tiles.length;
 			int height = tiles[0].length;
@@ -362,7 +365,7 @@ public class ToolsPanel extends JPanel implements EventSubscriber<HotKeyEvent>
 					newTiles[i][j] = tiles[height - (i + 1)][j];
 				}
 			}
-			_parentBuilder.getDrawPanel().setColorGrid(newTiles);
+			_model.setColorGrid(newTiles);
 		}
 	}
 
@@ -371,7 +374,7 @@ public class ToolsPanel extends JPanel implements EventSubscriber<HotKeyEvent>
 		@Override
 		public void actionPerformed(ActionEvent e)
 		{
-			Color[][] tiles = _parentBuilder.getDrawPanel().getColorGrid();
+			Color[][] tiles = _model.getColorGrid();
 			Color[][] newTiles = new Color[tiles.length][tiles[0].length];
 			int width = tiles.length;
 			int height = tiles[0].length;
@@ -383,7 +386,7 @@ public class ToolsPanel extends JPanel implements EventSubscriber<HotKeyEvent>
 					newTiles[i][j] = tiles[i][width - (j + 1)];
 				}
 			}
-			_parentBuilder.getDrawPanel().setColorGrid(newTiles);
+			_model.setColorGrid(newTiles);
 		}
 	}
 
@@ -392,7 +395,7 @@ public class ToolsPanel extends JPanel implements EventSubscriber<HotKeyEvent>
 		@Override
 		public void actionPerformed(ActionEvent e)
 		{
-			Color[][] tiles = _parentBuilder.getDrawPanel().getColorGrid();
+			Color[][] tiles = _model.getColorGrid();
 			Color[][] newTiles = new Color[tiles.length][tiles[0].length];
 			int width = tiles.length;
 			int height = tiles[0].length;
@@ -403,26 +406,28 @@ public class ToolsPanel extends JPanel implements EventSubscriber<HotKeyEvent>
 					newTiles[j][i] = tiles[height - i - 1][j];
 				}
 			}
-			_parentBuilder.getDrawPanel().setColorGrid(newTiles);
+			_model.setColorGrid(newTiles);
 		}
 	}
 
-	private class IconListener implements ActionListener
-	{
-		@Override
-		public void actionPerformed(ActionEvent e)
-		{
-			_parentBuilder.calculateCursor();
-		}
-	}
+	// private class IconListener implements ActionListener
+	// {
+	// @Override
+	// public void actionPerformed(ActionEvent e)
+	// {
+	// _parentBuilder.calculateCursor();
+	// }
+	// }
 
 	@Override
-	public void onEvent(HotKeyEvent e_)
+	public void addListeners()
 	{
+		// TODO Auto-generated method stub
 
 	}
 
 	private static int DEFAULT_PIXEL_SIZE = 1;
+	private static int DEFAULT_BRUSH_SIZE = 1;
 
 	private JMenuBar _menuBar;
 
@@ -439,6 +444,7 @@ public class ToolsPanel extends JPanel implements EventSubscriber<HotKeyEvent>
 	private JLabel _pixelSizeLabel;
 
 	private JSlider _pixelSizeSlider;
+	private JSlider _brushSizeSlider;
 
 	private JColorChooser _colorChooser;
 	private JToggleButton _eraseButton = new JToggleButton("(E)rase");
@@ -448,7 +454,5 @@ public class ToolsPanel extends JPanel implements EventSubscriber<HotKeyEvent>
 	private JButton _flipHoriztonalButton = new JButton("Flip Horizontal");
 	private JButton _flipVerticalButton = new JButton("Flip Vertical");
 	private JButton _rotateButton = new JButton("Rotate CCW");
-
-	private final SpriteBuilder _parentBuilder;
 
 }

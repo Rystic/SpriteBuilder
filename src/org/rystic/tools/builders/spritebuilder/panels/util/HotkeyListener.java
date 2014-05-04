@@ -18,8 +18,8 @@ public class HotkeyListener implements KeyListener
 	@Override
 	public void keyPressed(KeyEvent e_)
 	{
-		_toolsPanel = _parentBuilder.getToolsPanel();
-		_drawPanel = _parentBuilder.getDrawPanel();
+//		_toolsPanel = _parentBuilder.getToolsPanel();
+//		_drawPanel = _parentBuilder.getDrawPanel();
 		if (e_.getKeyCode() == KeyEvent.VK_E)
 		{
 			_toolsPanel.setErase(!_toolsPanel.isErase());
@@ -40,7 +40,7 @@ public class HotkeyListener implements KeyListener
 		}
 		else if (e_.getKeyCode() == KeyEvent.VK_S && e_.isControlDown())
 		{
-			PNGDrawer.drawPNG(_drawPanel.getColorGrid(), 5);
+			//PNGDrawer.drawPNG(_drawPanel.getColorGrid(), 5);
 		}
 		_parentBuilder.calculateCursor();
 		_toolsPanel.repaint();
