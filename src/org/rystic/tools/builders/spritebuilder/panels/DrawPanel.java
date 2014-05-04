@@ -224,16 +224,24 @@ public class DrawPanel extends AbstractBuilderPanel
 		{
 			LinkedList<Point> tiles = new LinkedList<Point>();
 			tiles.add(new Point(x, y));
+<<<<<<< HEAD
 
 			Color[][] colorGrid = _model.getColorGrid();
+=======
+>>>>>>> ce82932371f90217c71ca44ca1ba0dc0849cdbe7
 
 			while (tiles.size() > 0)
 			{
 				Point tile = tiles.pop();
 				int tileX = tile.x;
 				int tileY = tile.y;
+<<<<<<< HEAD
 				if (tileY >= _model.getGridHeight() || tileY < 0
 						|| tileX >= _model.getGridWidth() || tileX < 0)
+=======
+				if (tileY >= _height || tileY < 0 || tileX >= _width
+						|| tileX < 0)
+>>>>>>> ce82932371f90217c71ca44ca1ba0dc0849cdbe7
 					continue;
 				if ((_newColor == null && _oldColor == null)
 						|| (_newColor != null && _oldColor != null && _newColor
@@ -309,7 +317,11 @@ public class DrawPanel extends AbstractBuilderPanel
 			Color[][] colorGrid = _model.getColorGrid();
 			if (_undoGeneration <= 1)
 			{
+<<<<<<< HEAD
 				colorGrid[_xy.x][_xy.y] = _prevColor;
+=======
+				_colorGrid[_xy.x][_xy.y] = _prevColor;
+>>>>>>> ce82932371f90217c71ca44ca1ba0dc0849cdbe7
 				if (_head.equals(this))
 				{
 					_head = _head._next;

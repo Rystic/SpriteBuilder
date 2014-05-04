@@ -7,7 +7,11 @@ import java.awt.Point;
 import java.awt.Toolkit;
 
 import javax.swing.JFrame;
+<<<<<<< HEAD
 import javax.swing.SwingUtilities;
+=======
+import javax.swing.JTabbedPane;
+>>>>>>> ce82932371f90217c71ca44ca1ba0dc0849cdbe7
 
 import org.bushe.swing.event.EventSubscriber;
 import org.rystic.tools.builders.spritebuilder.panels.DrawPanel;
@@ -19,6 +23,7 @@ public class SpriteBuilder implements EventSubscriber<RepaintEvent>
 {
 	public SpriteBuilder(int width, int height)
 	{
+<<<<<<< HEAD
 		_model = new BuilderModel();
 		_model.setColorGrid(new Color[BuilderConstants.DEFAULT_IMAGE_SIZE][BuilderConstants.DEFAULT_IMAGE_SIZE]);
 
@@ -33,6 +38,16 @@ public class SpriteBuilder implements EventSubscriber<RepaintEvent>
 			}
 		});
 	}
+=======
+		_toolPanelFrame.add(_toolsPanel);
+		_toolPanelFrame.setTitle("Tools Panel");
+		_toolPanelFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		_toolPanelFrame.setVisible(true);
+		_toolPanelFrame.pack();
+		_toolPanelFrame.setSize(
+				_toolPanelFrame.getWidth(),
+				_toolPanelFrame.getHeight() + 100);
+>>>>>>> ce82932371f90217c71ca44ca1ba0dc0849cdbe7
 
 	private void createToolPanel()
 	{
@@ -55,7 +70,14 @@ public class SpriteBuilder implements EventSubscriber<RepaintEvent>
 		_drawPanelFrame = new JFrame();
 		_drawPanel = new DrawPanel(_model);
 
+<<<<<<< HEAD
 		_drawPanelFrame.add(_drawPanel);
+=======
+		_drawPanelFrame.setLocation(_toolPanelFrame.getX()
+				+ _toolPanelFrame.getWidth(), 0);
+		_drawPanelFrame.setSize(600, 600);
+		_drawPanelFrame.add(_drawPanelTabbedPane);
+>>>>>>> ce82932371f90217c71ca44ca1ba0dc0849cdbe7
 		_drawPanelFrame.setTitle("Draw Panel");
 		_drawPanelFrame.setSize(600, 600);
 
@@ -103,8 +125,12 @@ public class SpriteBuilder implements EventSubscriber<RepaintEvent>
 		Toolkit toolkit = Toolkit.getDefaultToolkit();
 		Image fillCursor = toolkit.getImage("art/fillTool.png");
 		Image eraseCursor = toolkit.getImage("art/eraserIcon.png");
+<<<<<<< HEAD
 		Image fillPlusEraseCursor = toolkit
 				.getImage("art/fillPlusEraseTool.png");
+=======
+		Image fillPlusEraseCursor = toolkit.getImage("art/fillPlusEraseTool.png");
+>>>>>>> ce82932371f90217c71ca44ca1ba0dc0849cdbe7
 		Image eyeDroperCursor = toolkit.getImage("art/eyeDropperTool.png");
 
 		Cursor newCursor;// = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
@@ -145,11 +171,18 @@ public class SpriteBuilder implements EventSubscriber<RepaintEvent>
 
 	public static void main(String[] args)
 	{
+<<<<<<< HEAD
 		new SpriteBuilder(BuilderConstants.DEFAULT_IMAGE_SIZE,
 				BuilderConstants.DEFAULT_IMAGE_SIZE);
 	}
 
 	private static BuilderModel _model;
+=======
+		 new SpriteBuilder(BuilderConstants.DEFAULT_IMAGE_SIZE, BuilderConstants.DEFAULT_IMAGE_SIZE);
+	}
+
+	private JTabbedPane _drawPanelTabbedPane = new JTabbedPane();
+>>>>>>> ce82932371f90217c71ca44ca1ba0dc0849cdbe7
 
 	private ToolsPanel _toolsPanel;
 	private DrawPanel _drawPanel;

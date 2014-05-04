@@ -1,9 +1,12 @@
 package org.rystic.tools.builders.spritebuilder;
 
+<<<<<<< HEAD
 import java.awt.Color;
 
 import javax.swing.JColorChooser;
 
+=======
+>>>>>>> ce82932371f90217c71ca44ca1ba0dc0849cdbe7
 public class BuilderModel
 {
 	public BuilderModel()
@@ -13,6 +16,7 @@ public class BuilderModel
 		_isFill = false;
 	}
 	
+<<<<<<< HEAD
 	public void setColorGrid(Color[][] colorGrid_)
 	{
 		_colorGrid = colorGrid_;
@@ -68,20 +72,45 @@ public class BuilderModel
 		return _pixelSize;
 	}
 
+=======
+	public void setEraser(boolean _isEraser)
+	{
+		this._isEraser = _isEraser;
+	}
+	
+	public void setEyedropper(boolean _isEyedropper)
+	{
+		this._isEyedropper = _isEyedropper;
+	}
+	
+	public void setFill(boolean _isFill)
+	{
+		this._isFill = _isFill;
+	}
+	
+>>>>>>> ce82932371f90217c71ca44ca1ba0dc0849cdbe7
 	public boolean isEraser()
 	{
 		return _isEraser;
 	}
+<<<<<<< HEAD
 
+=======
+	
+>>>>>>> ce82932371f90217c71ca44ca1ba0dc0849cdbe7
 	public boolean isEyedropper()
 	{
 		return _isEyedropper;
 	}
+<<<<<<< HEAD
 
+=======
+>>>>>>> ce82932371f90217c71ca44ca1ba0dc0849cdbe7
 	public boolean isFill()
 	{
 		return _isFill;
 	}
+<<<<<<< HEAD
 
 	public boolean isGrid()
 	{
@@ -110,10 +139,15 @@ public class BuilderModel
 	private int _pixelSize;
 
 	private JColorChooser _chooser;
+=======
+>>>>>>> ce82932371f90217c71ca44ca1ba0dc0849cdbe7
 	
 	private boolean _isEraser;
 	private boolean _isEyedropper;
 	private boolean _isFill;
+<<<<<<< HEAD
 	private boolean _isGrid;
 
+=======
+>>>>>>> ce82932371f90217c71ca44ca1ba0dc0849cdbe7
 }
